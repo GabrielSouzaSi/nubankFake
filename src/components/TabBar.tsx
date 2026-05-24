@@ -1,24 +1,13 @@
 import { ArrowDownUp, Smartphone } from "lucide-react-native"
-import {
-	CurrencyDollarSimpleIcon,
-	ShoppingBagIcon,
-} from "phosphor-react-native"
+import { CurrencyDollarSimpleIcon, ShoppingBagIcon } from "phosphor-react-native"
 import { TouchableOpacity, View } from "react-native"
 
 function TabBar({ state, descriptors, navigation }) {
 	const icons = {
-		index: (props) => (
-			<ArrowDownUp color={"#673ab7"} size={26} {...props} />
-		),
-		maney: (props) => (
-			<CurrencyDollarSimpleIcon color={"#673ab7"} size={26} {...props} />
-		),
-		store: (props) => (
-			<ShoppingBagIcon color={"#673ab7"} size={26} {...props} />
-		),
-		nucell: (props) => (
-			<Smartphone color={"#673ab7"} size={26} {...props} />
-		),
+		index: (props) => <ArrowDownUp color={"#673ab7"} size={26} {...props} />,
+		maney: (props) => <CurrencyDollarSimpleIcon color={"#673ab7"} size={26} {...props} />,
+		store: (props) => <ShoppingBagIcon color={"#673ab7"} size={26} {...props} />,
+		nucell: (props) => <Smartphone color={"#673ab7"} size={26} {...props} />,
 	}
 	return (
 		<View
@@ -80,9 +69,11 @@ function TabBar({ state, descriptors, navigation }) {
 						{icons[route.name]({
 							color: isFocused ? "#673ab7" : "#c9c9c9",
 						})}
-						{/* <Text style={{ color: isFocused ? "#673ab7" : "#c9c9c9" }}>
-              {label}
-            </Text> */}
+						{/* <Text
+							style={{ color: isFocused ? "#673ab7" : "#c9c9c9" }}
+						>
+							{label}
+						</Text> */}
 					</TouchableOpacity>
 				)
 			})}

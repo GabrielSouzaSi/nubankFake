@@ -1,0 +1,91 @@
+// contexts/AuthContext.tsx
+import { UserDTO } from "@/dtos/userDTO"
+import { API } from "@/lib/api"
+import {
+	storageAuthTokenGet,
+	storageAuthTokenRemove,
+	storageAuthTokenSave,
+} from "@/storage/storageAuthToken"
+import { storageUserGet, storageUserRemove, storageUserSave } from "@/storage/storageUser"
+import { createContext, ReactNode, useEffect, useMemo, useState } from "react"
+
+export type AuthContextDataProps = {
+	user: UserDTO | null
+	isBootstrapping: boolean // <— só no boot
+	authSubmitting: boolean // <— login/logout em andamento
+	signIn: (cpf: string, password: string) => Promise<void>
+	signOut: () => Promise<void>
+}
+
+type AuthContextProviderProps = { children: ReactNode }
+
+export const AuthContext = createContext<AuthContextDataProps>({} as AuthContextDataProps)
+
+export function AuthContextProvider({ children }: AuthContextProviderProps) {
+	const [user, setUser] = useState<UserDTO | null>(null)
+	const [isBootstrapping, setIsBootstrapping] = useState(true)
+	const [authSubmitting, setAuthSubmitting] = useState(false)
+	// const { ensureRegistered, pushToken } = usePush()
+
+	function applyAuthHeader(token: string | null) {
+		if (token) API.defaults.headers.common["Authorization"] = `Bearer ${token}`
+		else delete API.defaults.headers.common["Authorization"]
+	}
+
+	async function signIn(cpf: string, password: string) {
+		setAuthSubmitting(true)
+		try {
+			const { data } = await API.post("/auth/login", { cpf, password })
+			if (data?.user && data?.accessToken) {
+				await Promise.all([
+					storageUserSave(data.user),
+					storageAuthTokenSave(data.accessToken),
+				])
+				applyAuthHeader(data.accessToken)
+				setUser(data.user)
+				// const token = (await ensureRegistered()) ?? pushToken
+				// await API.post("/device/register", { token, platform: "android" })
+			}
+		} finally {
+			setAuthSubmitting(false)
+		}
+	}
+
+	async function signOut() {
+		setAuthSubmitting(true)
+		try {
+			await Promise.all([storageUserRemove(), storageAuthTokenRemove()])
+			applyAuthHeader(null)
+			setUser(null)
+		} finally {
+			setAuthSubmitting(false)
+		}
+	}
+
+	async function loadUserData() {
+		setIsBootstrapping(true)
+		try {
+			const [userLogged, token] = await Promise.all([storageUserGet(), storageAuthTokenGet()])
+			if (userLogged && token) {
+				applyAuthHeader(token)
+				setUser(userLogged)
+			} else {
+				applyAuthHeader(null)
+				setUser(null)
+			}
+		} finally {
+			setIsBootstrapping(false)
+		}
+	}
+
+	useEffect(() => {
+		loadUserData()
+	}, [])
+
+	const value = useMemo(
+		() => ({ user, isBootstrapping, authSubmitting, signIn, signOut }),
+		[user, isBootstrapping, authSubmitting],
+	)
+
+	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}

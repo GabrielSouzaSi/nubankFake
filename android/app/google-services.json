@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "107036192821",
+    "project_id": "nubankfake-df510",
+    "storage_bucket": "nubankfake-df510.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:107036192821:android:ab185a26e132ec1a32817c",
+        "android_client_info": {
+          "package_name": "com.gabrielsouza.nubankFake"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbHa9aTgwsbb0AfbWO7D1OZm_Gor6420c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
